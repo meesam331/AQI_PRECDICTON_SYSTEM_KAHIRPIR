@@ -39,7 +39,7 @@
         {% if forecast_error %}<div class="alert error">{{ forecast_error }}</div>{% endif %}
         {% if not model_available %}<div class="alert error">The trained model is unavailable. Add <strong>model.pkl</strong> or <strong>aqi_pipeline.pkl</strong> to the project root before making a prediction.</div>{% endif %}
 
-        {% if observed is not none %}
+        {% if observed is not none and latest is defined %}
         <section class="metrics" aria-label="Current air quality">
             <article class="metric-card accent-green"><span>Observed AQI</span><strong>{{ observed }}</strong><small>Latest Khairpur reading</small></article>
             <article class="metric-card accent-blue"><span>PM2.5</span><strong>{{ '%.1f'|format(latest.pm2_5) }}</strong><small>ug/m3 concentration</small></article>
