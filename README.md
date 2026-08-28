@@ -4,7 +4,7 @@ A production-ready AQI prediction web app for Khairpur, Pakistan, built for the 
 
 **Author:** Meeesam Raza
 
-**Live App:** [AQI Prediction System](web-production-c7cf8.up.railway.app)
+**Live App:** [AQI Prediction System](https://web-production-c7cf8.up.railway.app/)
 
 This project was migrated from Streamlit to Flask. The Flask application serves the HTML dashboard, loads the trained model, handles validation, and renders predictions in one deployable service.
 
