@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Model-backed air quality prediction for Khairpur, Pakistan.">
+    <title>AQI Prediction System | Khairpur</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" href="{{ url_for('home') }}"><span class="brand-mark">AQ</span><span>Khairpur Air</span></a>
+        <nav aria-label="Primary navigation"><a href="{{ url_for('home') }}">Dashboard</a><a href="{{ url_for('about') }}">About</a></nav>
+    </header>
+
+    <main class="page-shell">
+        <section class="hero">
+            <div>
+                <p class="eyebrow">Environmental intelligence / Sindh</p>
+                <h1>AQI Prediction System</h1>
+                <p class="hero-copy">A clearer view of Khairpur air quality, with a model-backed estimate when you need to look ahead.</p>
+                <p class="byline">Developed by Meeesam Raza for 10Pearls Internship</p>
+            </div>
+            <div class="hero-orbit" aria-hidden="true"><span></span><strong>KH</strong></div>
+        </section>
+
+        {% if show_about %}
+        <section class="about-panel" aria-labelledby="about-title">
+            <p class="eyebrow">Project profile</p>
+            <h2 id="about-title">Built for practical air-quality awareness.</h2>
+            <p>This portfolio project combines environmental readings with a trained machine-learning pipeline to estimate AQI from seven measurable conditions.</p>
+            <div class="about-grid"><div><strong>Author</strong><span>Meeesam Raza</span></div><div><strong>Program</strong><span>10Pearls Internship</span></div><div><strong>Service</strong><span>Flask + Gunicorn</span></div></div>
+            <a class="button secondary" href="{{ url_for('home') }}">Back to dashboard</a>
+        </section>
+        {% else %}
+        {% if forecast_error %}<div class="alert error">{{ forecast_error }}</div>{% endif %}
+        {% if not model_available %}<div class="alert error">The trained model is unavailable. Add <strong>model.pkl</strong> or <strong>aqi_pipeline.pkl</strong> to the project root before making a prediction.</div>{% endif %}
+
+        {% if observed is not none %}
+        <section class="metrics" aria-label="Current air quality">
+            <article class="metric-card accent-green"><span>Observed AQI</span><strong>{{ observed }}</strong><small>Latest Khairpur reading</small></article>
+            <article class="metric-card accent-blue"><span>PM2.5</span><strong>{{ '%.1f'|format(latest.pm2_5) }}</strong><small>ug/m3 concentration</small></article>
+            <article class="metric-card accent-{{ observed_class }}"><span>Health category</span><strong class="category-text">{{ observed_category }}</strong><small>{{ observed_message }}</small></article>
+        </section>
+        {% endif %}
+
+        <div class="status-line {% if source == 'live' %}live{% endif %}"><span class="status-dot"></span>{% if source == 'live' %}Live Open-Meteo readings connected{% elif source == 'sample' %}Live data unavailable; showing sample readings{% else %}Forecast data unavailable{% endif %}</div>
+
+        <section class="workspace">
+            <div class="outlook-panel">
+                <div class="section-heading"><div><p class="eyebrow">Short-range view</p><h2>Three-day outlook</h2></div><span class="section-tag">Khairpur</span></div>
+                {% if forecast %}
+                <div class="chart" aria-label="AQI outlook chart">
+                    {% for day in forecast %}<div class="chart-column"><div class="bar-value">{{ day.aqi|round|int }}</div><div class="bar" style="height: {{ [day.aqi / 3, 100]|min }}px"></div><strong>{{ day.day.strftime('%a') }}</strong><small>{{ day.day.strftime('%d %b') }}</small></div>{% endfor %}
+                </div>
+                <div class="table-wrap"><table><thead><tr><th>Date</th><th>AQI</th><th>PM2.5</th><th>Temp C</th><th>Humidity</th></tr></thead><tbody>{% for day in forecast %}<tr><td>{{ day.day.strftime('%a, %d %b') }}</td><td>{{ day.aqi|round(1) }}</td><td>{{ day.pm2_5|round(1) }}</td><td>{{ day.temp|round(1) }}</td><td>{{ day.humidity|round(1) }}%</td></tr>{% endfor %}</tbody></table></div>
+                {% else %}<p class="empty-state">No forecast readings are available right now.</p>{% endif %}
+            </div>
+
+            <div class="predict-panel">
+                <div class="section-heading"><div><p class="eyebrow">Model input</p><h2>Make a prediction</h2></div></div>
+                <p class="panel-copy">Use current measurements or explore a different scenario.</p>
+                {% if error %}<div class="alert error">{{ error }}</div>{% endif %}
+                {% if result is defined %}<div class="result-card {{ result_class }}"><span>Model estimate</span><strong>{{ result }}</strong><b>{{ result_category }}</b><small>{{ result_message }}</small></div>{% endif %}
+                <form action="{{ url_for('predict') }}" method="post" novalidate>
+                    <div class="form-grid">{% for field in feature_columns %}<label for="{{ field }}">{{ labels[field] }}<input id="{{ field }}" name="{{ field }}" type="number" min="0" step="any" required value="{{ values[field] if values is defined and values.get(field) is not none else defaults[field] }}"></label>{% endfor %}</div>
+                    <button class="button primary" type="submit"><span>Predict AQI</span><span aria-hidden="true">-&gt;</span></button>
+                </form>
+            </div>
+        </section>
+        {% endif %}
+    </main>
+
+    <footer>Copyright 2026 Meeesam Raza <span>|</span> 10Pearls Internship Project</footer>
+</body>
+</html>
