@@ -4,6 +4,8 @@ A production-ready AQI prediction web app for Khairpur, Pakistan, built for the 
 
 **Author:** Meeesam Raza
 
+**Live App:** [AQI Prediction System](https://web-production-c7cf8.up.railway.app/predict)
+
 This project was migrated from Streamlit to Flask. The Flask application serves the HTML dashboard, loads the trained model, handles validation, and renders predictions in one deployable service.
 
 ## Features
@@ -55,7 +57,7 @@ Open `http://127.0.0.1:5000`. The optional `PORT` environment variable controls 
 
 1. Push this repository to GitHub and create a new Railway project from the repository.
 2. Railway installs dependencies from `requirements.txt`.
-3. The `Procfile` starts the service with `web: gunicorn app:app`.
+3. The `Procfile` starts the service with `web: gunicorn app:app --bind 0.0.0.0:$PORT`.
 4. Confirm the deployment with `https://your-domain/health`.
 
 Railway supplies `PORT` automatically. No second API or Streamlit service is required.
